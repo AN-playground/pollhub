@@ -39,3 +39,13 @@ polls-*.tar
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+# Ignore generated static assets
+/priv/static/assets/*
+!/priv/static/assets/.keep
+
+_build
+deps
+assets/node_modules
+test
+
