@@ -1,2 +1,2 @@
 # hello.exs
-IO.puts(Polls.hello())
+IO.puts(PollHub.hello())

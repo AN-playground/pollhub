@@ -1,6 +1,6 @@
-defmodule Polls do
+defmodule PollHub do
   @moduledoc """
-  Documentation for `Polls`.
+  Documentation for `PollHub`.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Polls do
 
   ## Examples
 
-      iex> Polls.hello()
+      iex> PollHub.hello()
       :world
 
   """

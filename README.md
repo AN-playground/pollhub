@@ -1,16 +1,16 @@
-# Polls
+# PollHub
 
 **TODO: Add description**
 
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `polls` to your list of dependencies in `mix.exs`:
+by adding `pollhub` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:polls, "~> 0.1.0"}
+    {:pollhub, "~> 0.1.0"}
   ]
 end
 ```
