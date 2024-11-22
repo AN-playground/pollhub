@@ -41,7 +41,7 @@ polls-*.tar
 /dataSources.local.xml
 
 # Ignore generated static assets
-/priv/static/assets/*
+/priv/static/*
 !/priv/static/assets/.keep
 
 _build
