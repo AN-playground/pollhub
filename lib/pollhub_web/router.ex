@@ -68,6 +68,11 @@ defmodule PollhubWeb.Router do
       on_mount: [{PollhubWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/polls", PollLive.Index, :index
+      live "/polls/new", PollLive.Index, :new
+      live "/polls/:id/edit", PollLive.Index, :edit
+
     end
   end
 
