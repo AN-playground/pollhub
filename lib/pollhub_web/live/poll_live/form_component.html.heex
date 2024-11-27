@@ -1,0 +1,57 @@
+<form
+  phx-submit="save"
+  phx-change="validate"
+  phx-target={@myself}
+  id="poll-form"
+>
+  <!-- Poll Name -->
+  <div>
+    <.label for="poll_name" form={@form} field={:name}>Poll Name</.label>
+    <.input form={@form} field={:name} class="input" />
+    <%= if error = Keyword.get(@form.errors, :name) do %>
+      <span class="error-message"><%= error %></span>
+    <% end %>
+  </div>
+
+  <!-- Entries -->
+  <div>
+    <h3>Entries</h3>
+    <ul>
+      <%= for {entry_changeset, index} <- Enum.with_index(@entries_changesets || []) do %>
+        <li>
+          <.input form={@form} field={[:entries_changesets, index, :title]} id={"entry_title_#{index}"} class="input" />
+          <%= if error = Keyword.get(entry_changeset.errors, :title) do %>
+            <span class="error-message"><%= error %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <!-- Add New Entry -->
+  <div>
+    <label for="new_entry">Add New Entry</label>
+    <input
+      type="text"
+      id="new_entry"
+      name="new_entry"
+      value={@new_entry}
+      phx-debounce="blur"
+      phx-target={@myself}
+      phx-input="update_new_entry"
+      class="input"
+    />
+    <button
+      type="button"
+      phx-click="add_entry"
+      phx-target={@myself}
+      phx-value-new_entry={@new_entry}
+      class="btn"
+    >
+      Add Entry
+    </button>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn-primary">Save Poll</button>
+</form>

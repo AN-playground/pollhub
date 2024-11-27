@@ -1,35 +1,38 @@
 defmodule PollhubWeb.PollLive.Index do
   use PollhubWeb, :live_view
 
+  alias Pollhub.Repo
   alias Pollhub.Polls
-  alias Pollhub.Polls.Poll
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :polls, Polls.list_polls())}
+    polls = Polls.list_polls() |> Repo.preload(:entries)  # Preload entries for all polls listed
+    {:ok, stream(socket, :polls, polls)}
   end
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Poll")
-    |> assign(:poll, Polls.get_poll!(id))
-  end
-
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Poll")
-    |> assign(:poll, %Poll{})
+    socket = apply_action(socket, socket.assigns.live_action, params)
+    {:noreply, socket}
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Polls")
-    |> assign(:poll, nil)
+    |> assign(:poll, %Pollhub.Polls.Poll{name: "", entries: []})
+  end
+
+  defp apply_action(socket, :new, _params) do
+    socket
+    |> assign(:page_title, "New Poll")
+    |> assign(:poll, %Pollhub.Polls.Poll{name: "", entries: []})  # Empty entries for new poll
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    poll = Polls.get_poll!(id) |> Repo.preload(:entries)  # Preload entries for the poll you're editing
+    socket
+    |> assign(:page_title, "Edit Poll")
+    |> assign(:poll, poll)  # Assign the poll with preloaded entries to the socket
   end
 
   @impl true

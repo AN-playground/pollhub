@@ -1,104 +1,62 @@
 defmodule Pollhub.Polls do
-  @moduledoc """
-  The Polls context.
-  """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
+
   alias Pollhub.Repo
+  alias Pollhub.Polls.{Poll, Entry}
 
-  alias Pollhub.Polls.Poll
-
-  @doc """
-  Returns the list of polls.
-
-  ## Examples
-
-      iex> list_polls()
-      [%Poll{}, ...]
-
-  """
   def list_polls do
     Repo.all(Poll)
+    |> Repo.preload(:entries)
   end
 
-  @doc """
-  Gets a single poll.
+  def get_poll!(id) do
+    Poll
+    |> Repo.get!(id)
+    |> Repo.preload(:entries)
+  end
 
-  Raises `Ecto.NoResultsError` if the Poll does not exist.
-
-  ## Examples
-
-      iex> get_poll!(123)
-      %Poll{}
-
-      iex> get_poll!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_poll!(id), do: Repo.get!(Poll, id)
-
-  @doc """
-  Creates a poll.
-
-  ## Examples
-
-      iex> create_poll(%{field: value})
-      {:ok, %Poll{}}
-
-      iex> create_poll(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_poll(attrs \\ %{}) do
     %Poll{}
     |> Poll.changeset(attrs)
     |> Repo.insert()
+    |> case do
+         {:ok, poll} ->
+           poll = Repo.preload(poll, :entries)
+           {:ok, poll}
+
+         {:error, changeset} ->
+           {:error, changeset}
+       end
   end
 
-  @doc """
-  Updates a poll.
-
-  ## Examples
-
-      iex> update_poll(poll, %{field: new_value})
-      {:ok, %Poll{}}
-
-      iex> update_poll(poll, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def update_poll(%Poll{} = poll, attrs) do
     poll
     |> Poll.changeset(attrs)
     |> Repo.update()
   end
 
-  @doc """
-  Deletes a poll.
-
-  ## Examples
-
-      iex> delete_poll(poll)
-      {:ok, %Poll{}}
-
-      iex> delete_poll(poll)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_poll(%Poll{} = poll) do
     Repo.delete(poll)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking poll changes.
-
-  ## Examples
-
-      iex> change_poll(poll)
-      %Ecto.Changeset{data: %Poll{}}
-
-  """
   def change_poll(%Poll{} = poll, attrs \\ %{}) do
-    Poll.changeset(poll, attrs)
+    poll
+    |> cast(attrs, [:name])
+    |> cast_assoc(:entries, with: &Entry.changeset/2, required: false)
+    |> validate_required([:name])
+  end
+
+  def add_entry_to_poll(%Poll{} = poll, entry_attrs) do
+    %Entry{}
+    |> Entry.changeset(Map.put(entry_attrs, :poll_id, poll.id))
+    |> Repo.insert()
+  end
+
+  def change_entry(%Entry{} = entry, attrs \\ %{}) do
+    entry
+    |> cast(attrs, [:title, :votes, :poll_id])
+    |> validate_required([:title])
   end
 end

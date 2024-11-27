@@ -1,24 +1,26 @@
+<!-- polls/index.html.heex -->
+
+<%= @page_title %>
+
 <.header>
-  Listing Polls
+  <%= @page_title %>
   <:actions>
-    <.link patch={~p"/polls/new"}>
+    <.link patch={~p"/polls/new"} phx-click={JS.push_focus()}>
       <.button>New Poll</.button>
     </.link>
   </:actions>
 </.header>
 
-<.table
-  id="polls"
-  rows={@streams.polls}
-  row_click={fn {_id, poll} -> JS.navigate(~p"/polls/#{poll}") end}
->
+<.table id="polls" rows={@streams.polls} row_click={fn {_id, poll} -> JS.navigate(~p"/polls/#{poll.id}") end}>
   <:col :let={{_id, poll}} label="Name"><%= poll.name %></:col>
+
   <:action :let={{_id, poll}}>
     <div class="sr-only">
-      <.link navigate={~p"/polls/#{poll}"}>Show</.link>
+      <.link navigate={~p"/polls/#{poll.id}"}>Show</.link>
     </div>
-    <.link patch={~p"/polls/#{poll}/edit"}>Edit</.link>
+    <.link patch={~p"/polls/#{poll.id}/edit"}>Edit</.link>
   </:action>
+
   <:action :let={{id, poll}}>
     <.link
       phx-click={JS.push("delete", value: %{id: poll.id}) |> hide("##{id}")}

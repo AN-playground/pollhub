@@ -2,7 +2,7 @@
   Poll <%= @poll.id %>
   <:subtitle>This is a poll record from your database.</:subtitle>
   <:actions>
-    <.link patch={~p"/polls/#{@poll}/show/edit"} phx-click={JS.push_focus()}>
+    <.link patch={~p"/polls/#{@poll.id}/edit"} phx-click={JS.push_focus()}>
       <.button>Edit poll</.button>
     </.link>
   </:actions>
@@ -10,17 +10,31 @@
 
 <.list>
   <:item title="Name"><%= @poll.name %></:item>
+
+  <%= if @poll.entries && length(@poll.entries) > 0 do %>
+    <h3>Poll Entries</h3>
+    <ul>
+      <%= for {entry, index} <- Enum.with_index(@poll.entries) do %>  <!-- Manually adding index -->
+        <li>
+          <%= entry.title %>
+          <!-- You can include other entry fields here as well -->
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No entries found for this poll.</p>
+  <% end %>
 </.list>
 
 <.back navigate={~p"/polls"}>Back to polls</.back>
 
-<.modal :if={@live_action == :edit} id="poll-modal" show on_cancel={JS.patch(~p"/polls/#{@poll}")}>
+<.modal :if={@live_action == :edit} id="poll-modal" show on_cancel={JS.patch(~p"/polls/#{@poll.id}")}>
   <.live_component
     module={PollhubWeb.PollLive.FormComponent}
     id={@poll.id}
     title={@page_title}
     action={@live_action}
     poll={@poll}
-    patch={~p"/polls/#{@poll}"}
+    patch={~p"/polls/#{@poll.id}"}
   />
 </.modal>
