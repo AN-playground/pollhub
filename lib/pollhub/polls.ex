@@ -42,6 +42,7 @@ defmodule Pollhub.Polls do
   end
 
   def change_poll(%Poll{} = poll, attrs \\ %{}) do
+    IO.inspect(attrs, label: "DEBUG: Attributes passed to change_poll")
     poll
     |> cast(attrs, [:name])
     |> cast_assoc(:entries, with: &Entry.changeset/2, required: false)

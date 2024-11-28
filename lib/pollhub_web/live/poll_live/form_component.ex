@@ -10,33 +10,31 @@ defmodule PollhubWeb.PollLive.FormComponent do
 
   @impl true
   def update(%{poll: %Poll{id: nil}} = assigns, socket) do
-    IO.inspect(assigns, label: "DEBUG: Poll in FormComponent (nil)")
+    IO.inspect(assigns, label: "DEBUG: Poll in FormComponent (new)")
 
+    # Handle new poll creation with default name
     poll_attrs = %{name: "New Poll", entries: []}
 
     case Polls.create_poll(poll_attrs) do
       {:ok, poll} ->
-        # Preload entries to avoid Ecto.Association.NotLoaded
         poll = Repo.preload(poll, :entries)
         changeset = Polls.change_poll(poll)
-        form = to_form(changeset)
 
         entries_changesets = Enum.map(poll.entries, &Polls.change_entry/1)
 
-        IO.inspect(changeset, label: "DEBUG: Changeset at end of FormComponent (nil)")
-        IO.inspect(form, label: "DEBUG: Form at end of FormComponent (nil)")
+        IO.inspect(to_form(changeset), label: "DEBUG: Changeset at end of FormComponent (new)")
 
-        {:ok, assign(socket, assigns |> Map.put(:form, form) |> Map.put(:entries_changesets, entries_changesets) |> Map.put_new(:new_entry, ""))}
-
+        {:ok, assign(socket, assigns
+                             |> Map.put(:form, to_form(changeset))
+                             |> Map.put(:entries_changesets, entries_changesets)
+                             |> Map.put_new(:new_entry, ""))}
       {:error, changeset} ->
-        form = to_form(changeset)
-        IO.inspect(changeset, label: "DEBUG: Changeset in error case of FormComponent (nil)")
-        {:ok, assign(socket, assigns |> Map.put(:form, form))}
+        {:ok, assign(socket, assigns |> Map.put(:form, to_form(changeset)))}
     end
   end
 
   @impl true
-  def update(%{poll: %Poll{id: _}} = assigns, socket) do
+  def update(%{poll: %Poll{id: id}} = assigns, socket) do
     IO.inspect(assigns, label: "DEBUG: Poll in FormComponent (existing)")
 
     poll = assigns.poll
@@ -52,7 +50,10 @@ defmodule PollhubWeb.PollLive.FormComponent do
 
     IO.inspect(form, label: "DEBUG: Form at end of update/2")
 
-    {:ok, assign(socket, assigns |> Map.put(:form, form) |> Map.put(:entries_changesets, entries_changesets) |> Map.put_new(:new_entry, ""))}
+    {:ok, assign(socket, assigns
+                         |> Map.put(:form, form)
+                         |> Map.put(:entries_changesets, entries_changesets)
+                         |> Map.put_new(:new_entry, ""))}
   end
 
   @impl true

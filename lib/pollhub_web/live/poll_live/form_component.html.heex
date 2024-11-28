@@ -7,7 +7,7 @@
   <!-- Poll Name -->
   <div>
     <.label for="poll_name" form={@form} field={:name}>Poll Name</.label>
-    <.input form={@form} field={:name} class="input" />
+    <input type="text" name="poll[name]" value={@form.data.name || ""} />
     <%= if error = Keyword.get(@form.errors, :name) do %>
       <span class="error-message"><%= error %></span>
     <% end %>

@@ -1,6 +1,7 @@
 defmodule PollhubWeb.PollLive.Show do
   use PollhubWeb, :live_view
 
+  alias Pollhub.Repo
   alias Pollhub.Polls
 
   @impl true
@@ -10,6 +11,8 @@ defmodule PollhubWeb.PollLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
+    poll = Polls.get_poll!(id) |> Repo.preload(:entries)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
